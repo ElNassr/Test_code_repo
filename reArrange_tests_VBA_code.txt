@@ -1,9 +1,38 @@
+Function CountNonEmptyCellsInColumn(col As Long) As Long
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim count As Long
+    Dim rng As Range
+    
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your sheet name
+    
+    ' Find the last row in the specified column
+    lastRow = ws.Cells(ws.Rows.count, col).End(xlUp).Row
+    
+    ' Define the range of the column
+    Set rng = ws.Range(ws.Cells(1, col), ws.Cells(lastRow, col))
+    
+    ' Initialize the counter
+    count = 0
+    
+    ' Count the number of non-empty cells in the column
+    For Each cell In rng
+        If Not IsEmpty(cell) Then
+            count = count + 1
+        End If
+    Next cell
+    
+    CountNonEmptyCellsInColumn = count
+End Function
+
+
+
 Sub RearrangeTestCases()
     Dim sws As Worksheet
     Dim tws As Worksheet
     Dim lastRow As Long
-    Dim newRow_s As Long ' Corrected variable name
-    Dim newRow_t As Long ' Corrected variable name
+    Dim newRow_s As Long
+    Dim newRow_t As Long
     Dim key As String
     Dim name As String
     Dim objective As String
@@ -19,7 +48,6 @@ Sub RearrangeTestCases()
     
     ' Find the last row in column F of source sheet
     lastRow = sws.Cells(sws.Rows.count, "F").End(xlUp).Row
-    
     ' Count the number of non-empty cells in column A of source sheet
     RowCount = CountNonEmptyCellsInColumn(1)
     
@@ -30,46 +58,158 @@ Sub RearrangeTestCases()
     
     ' Loop through each row in the source sheet
     For i = 1 To RowCount - 1
-        ' New test case
-        key = sws.Cells(newRow_s, 1).Value
-        name = sws.Cells(newRow_s, 2).Value
-        objective = sws.Cells(newRow_s, 4).Value
-        
-        ' Check if the feature has changed
-        If feature <> sws.Cells(newRow_s, 5).Value Then
-            feature = sws.Cells(newRow_s, 5).Value
+            ' New test case
+            key = sws.Cells(newRow_s, 1).Value
+            name = sws.Cells(newRow_s, 2).Value
+            objective = sws.Cells(newRow_s, 4).Value
             
-            ' Write "Feature" label and the feature value in the target sheet
-            With tws.Cells(newRow_t, 1)
-                .Value = "Feature"
+            ' Check if the feature has changed
+            If feature <> sws.Cells(newRow_s, 5).Value Then
+                feature = sws.Cells(newRow_s, 5).Value
+                ' Write "Feature" label and the feature value in the target sheet
+                With tws.Cells(newRow_t, 1)
+                    .Value = "Feature"
+                    .Font.Bold = True ' Make the text bold
+                    .Interior.Color = RGB(0, 195, 255) ' Set light blue background color
+                End With
+                With tws.Cells(newRow_t, 2)
+                    .Value = feature
+                    .Font.Bold = True ' Make the text bold
+                    .Interior.Color = RGB(0, 195, 255) ' Set light blue background color
+                End With
+            End If
+            
+            ' Write key and name
+            With tws.Cells(newRow_t + 1, 1)
+                .Value = key
                 .Font.Bold = True ' Make the text bold
-                .Interior.Color = RGB(173, 216, 230) ' Set light blue background color
             End With
-            tws.Cells(newRow_t, 2).Value = feature ' Write the feature value
+            With tws.Cells(newRow_t + 1, 2)
+                .Value = "Name"
+                .Font.Bold = True ' Make the text bold
+            End With
+            With tws.Cells(newRow_t + 1, 3)
+                .Value = name
+                .Font.Bold = True ' Make the text bold
+            End With
             
-            ' Increment newRow_t to the next row for the next feature
-            newRow_t = newRow_t + 1
-        End If
-        
-        ' Write key and name in the target sheet
-        tws.Cells(newRow_t, 1).Value = key
-        tws.Cells(newRow_t, 2).Value = "Name"
-        
-        ' Write objective in the target sheet
-        tws.Cells(newRow_t + 1, 2).Value = "Objective"
-        
-        ' Find number of test steps
-        emptyCellCount = 0
-        Do While sws.Cells(newRow_s + emptyCellCount + 1, 1).Value = "" And (newRow_s + emptyCellCount + 1) <= lastRow
-            emptyCellCount = emptyCellCount + 1
-        Loop
-        
-        ' Write test steps in the target sheet
-        tws.Cells(newRow_t + 2, 2).Value = "Test steps"
-        sws.Range(sws.Cells(newRow_s, 6), sws.Cells(newRow_s + emptyCellCount, 6)).Copy tws.Cells(newRow_t + 2, 3)
-        
-        ' Move to the next test case
-        newRow_s = newRow_s + 1 + emptyCellCount
-        newRow_t = newRow_t + 4 + emptyCellCount
+            ' Write objective
+            With tws.Cells(newRow_t + 2, 2)
+                .Value = "Objective"
+                .Font.Bold = True ' Make the text bold
+                .Interior.Color = RGB(220, 220, 220) ' Set light grey background color
+            End With
+            With tws.Cells(newRow_t + 2, 3)
+                .Value = objective
+                .Interior.Color = RGB(220, 220, 220) ' Set light grey background color
+            End With
+            
+            ' Find number of test steps
+            emptyCellCount = 0
+            Do While sws.Cells(newRow_s + emptyCellCount + 1, 1).Value = "" And (newRow_s + emptyCellCount + 1) <= lastRow
+                emptyCellCount = emptyCellCount + 1
+            Loop
+            
+            ' Write test steps
+            With tws.Cells(newRow_t + 3, 2)
+                .Value = "Test steps"
+                .Font.Bold = True ' Make the text bold
+                .Interior.Color = RGB(160, 160, 160) ' Set grey background color
+            End With
+            sws.Range(sws.Cells(newRow_s, 6), sws.Cells(newRow_s + emptyCellCount, 6)).Copy tws.Cells(newRow_t + 3, 3)
+            
+            ' Move to the next test case
+            newRow_s = newRow_s + 1 + emptyCellCount
+            newRow_t = newRow_t + 4 + emptyCellCount
     Next i
 End Sub
+
+Sub MakeSumurryPage()
+    Dim sws As Worksheet
+    Dim tws As Worksheet
+    Dim lastRow As Long
+    Dim newRow_s As Long
+    Dim newRow_t As Long
+    Dim key As String
+    Dim name As String
+    Dim objective As String
+    Dim feature As String
+    Dim emptyCellCount As Long
+    Dim testStepCount As Long
+    Dim i As Long
+    
+    ' Set references to source and target sheets
+    Set sws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your source sheet name
+    Set tws = ThisWorkbook.Sheets("Sheet3") ' Change "Sheet3" to your target sheet name
+    
+    ' Find the last row in column F of source sheet
+    lastRow = sws.Cells(sws.Rows.count, "F").End(xlUp).Row
+    ' Count the number of non-empty cells in column A of source sheet
+    RowCount = CountNonEmptyCellsInColumn(1)
+    
+    ' Initialize variables
+    feature = "Initial string"
+    newRow_s = 2
+    newRow_t = 1
+    
+    ' Loop through each row in the source sheet
+    For i = 1 To RowCount - 1
+            ' New test case
+            key = sws.Cells(newRow_s, 1).Value
+            name = sws.Cells(newRow_s, 2).Value
+            objective = sws.Cells(newRow_s, 4).Value
+            
+            ' Check if the feature has changed
+            If feature <> sws.Cells(newRow_s, 5).Value Then
+                feature = sws.Cells(newRow_s, 5).Value
+                ' Write "Feature" label and the feature value in the target sheet
+                With tws.Cells(newRow_t, 1)
+                    .Value = "Feature"
+                    .Font.Bold = True ' Make the text bold
+                    .Interior.Color = RGB(0, 195, 255) ' Set light blue background color
+                End With
+                With tws.Cells(newRow_t, 2)
+                    .Value = feature
+                    .Font.Bold = True ' Make the text bold
+                    .Interior.Color = RGB(0, 195, 255) ' Set light blue background color
+                End With
+            End If
+            
+            ' Write key and name
+            With tws.Cells(newRow_t + 1, 1)
+                .Value = key
+                .Font.Bold = True ' Make the text bold
+            End With
+            With tws.Cells(newRow_t + 1, 2)
+                .Value = "Name"
+                .Font.Bold = True ' Make the text bold
+            End With
+            With tws.Cells(newRow_t + 1, 3)
+                .Value = name
+                .Font.Bold = True ' Make the text bold
+            End With
+            
+            ' Write objective
+            With tws.Cells(newRow_t + 2, 2)
+                .Value = "Objective"
+                .Font.Bold = True ' Make the text bold
+                .Interior.Color = RGB(220, 220, 220) ' Set light grey background color
+            End With
+            With tws.Cells(newRow_t + 2, 3)
+                .Value = objective
+                .Interior.Color = RGB(220, 220, 220) ' Set light grey background color
+            End With
+            
+            ' Find number of test steps
+            emptyCellCount = 0
+            Do While sws.Cells(newRow_s + emptyCellCount + 1, 1).Value = "" And (newRow_s + emptyCellCount + 1) <= lastRow
+                emptyCellCount = emptyCellCount + 1
+            Loop
+            
+            
+            ' Move to the next test case
+            newRow_s = newRow_s + 1 + emptyCellCount
+            newRow_t = newRow_t + 3
+    Next i
+End Sub
+
