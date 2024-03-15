@@ -46,6 +46,24 @@ Sub RearrangeTestCases()
     Set sws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your source sheet name
     Set tws = ThisWorkbook.Sheets("Sheet2") ' Change "Sheet2" to your target sheet name
     
+    'Configure headers of the pages
+    With tws.Range(tws.Cells(1, 1), tws.Cells(1, 10)) ' Adjust the range as needed
+        .Merge ' Merge the cells
+        .Value = "DAIKIN  -  EMEA Design Center - Electrics & Controls - Test plan"
+        .Font.Bold = True ' Make the text bold
+        .Font.Color = RGB(0, 210, 255) ' Set light blue background color
+        .HorizontalAlignment = xlCenter ' Center align the text
+    End With
+    With tws.Range(tws.Cells(3, 1), tws.Cells(3, 4)) ' Adjust the range as needed
+        .Merge ' Merge the cells
+        .Value = "Test Plan Summary"
+        .Font.Bold = True ' Make the text bold
+        .Interior.Color = RGB(0, 210, 255) ' Set light blue background color
+        .Font.Color = RGB(0, 0, 0)
+        .Font.Size = 16 ' Set font size to 16 points
+        .HorizontalAlignment = xlCenter ' Center align the text
+    End With
+    
     ' Find the last row in column F of source sheet
     lastRow = sws.Cells(sws.Rows.count, "F").End(xlUp).Row
     ' Count the number of non-empty cells in column A of source sheet
@@ -54,7 +72,7 @@ Sub RearrangeTestCases()
     ' Initialize variables
     feature = "Initial string"
     newRow_s = 2
-    newRow_t = 1
+    newRow_t = 6
     
     ' Loop through each row in the source sheet
     For i = 1 To RowCount - 1
@@ -142,6 +160,24 @@ Sub MakeSumurryPage()
     Set sws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your source sheet name
     Set tws = ThisWorkbook.Sheets("Sheet3") ' Change "Sheet3" to your target sheet name
     
+    'Configure headers of the pages
+    With tws.Range(tws.Cells(1, 1), tws.Cells(1, 10)) ' Adjust the range as needed
+        .Merge ' Merge the cells
+        .Value = "DAIKIN  -  EMEA Design Center - Electrics & Controls - Test plan"
+        .Font.Bold = True ' Make the text bold
+        .Font.Color = RGB(0, 210, 255) ' Set light blue background color
+        .HorizontalAlignment = xlCenter ' Center align the text
+    End With
+    With tws.Range(tws.Cells(3, 1), tws.Cells(3, 4)) ' Adjust the range as needed
+        .Merge ' Merge the cells
+        .Value = "Test Plan Summary"
+        .Font.Bold = True ' Make the text bold
+        .Interior.Color = RGB(0, 210, 255) ' Set light blue background color
+        .Font.Color = RGB(0, 0, 0)
+        .Font.Size = 16 ' Set font size to 16 points
+        .HorizontalAlignment = xlCenter ' Center align the text
+    End With
+    
     ' Find the last row in column F of source sheet
     lastRow = sws.Cells(sws.Rows.count, "F").End(xlUp).Row
     ' Count the number of non-empty cells in column A of source sheet
@@ -150,7 +186,7 @@ Sub MakeSumurryPage()
     ' Initialize variables
     feature = "Initial string"
     newRow_s = 2
-    newRow_t = 1
+    newRow_t = 6
     
     ' Loop through each row in the source sheet
     For i = 1 To RowCount - 1
@@ -212,4 +248,5 @@ Sub MakeSumurryPage()
             newRow_t = newRow_t + 3
     Next i
 End Sub
+
 
